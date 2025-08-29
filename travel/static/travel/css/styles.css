@@ -1,0 +1,59 @@
+body {
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+/* Auth form styling */
+.auth-form {
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+/* Hero Section on Index Page */
+.hero-section {
+    background: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=3600') no-repeat center center;
+    background-size: cover;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.hero-section h1 {
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Card Enhancements */
+.card {
+    border: none;
+    transition: transform .2s, box-shadow .2s;
+    border-radius: 10px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.card-title .fa-solid {
+    margin-right: 8px;
+}
+
+/* Booking Status Badges */
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}

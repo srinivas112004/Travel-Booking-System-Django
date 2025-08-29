@@ -1,0 +1,85 @@
+{% extends 'travel/base.html' %}
+{% block content %}
+
+<h2><i class="fas fa-search"></i> Available Travel Options</h2>
+<hr>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-3 align-items-center">
+      <div class="col-md-2">
+        <label for="type" class="form-label visually-hidden">Type</label>
+        <select name="type" id="type" class="form-select">
+          <option value="">Any Type</option>
+          <option value="FLIGHT" {% if request.GET.type == "FLIGHT" %}selected{% endif %}>Flight</option>
+          <option value="TRAIN" {% if request.GET.type == "TRAIN" %}selected{% endif %}>Train</option>
+          <option value="BUS" {% if request.GET.type == "BUS" %}selected{% endif %}>Bus</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="source" class="form-label visually-hidden">Source</label>
+        <input name="source" id="source" class="form-control" placeholder="Source" value="{{ request.GET.source }}">
+      </div>
+      <div class="col-md-3">
+        <label for="destination" class="form-label visually-hidden">Destination</label>
+        <input name="destination" id="destination" class="form-control" placeholder="Destination" value="{{ request.GET.destination }}">
+      </div>
+      <div class="col-md-2">
+        <label for="date" class="form-label visually-hidden">Date</label>
+        <input name="date" type="date" id="date" class="form-control" value="{{ request.GET.date }}">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary w-100">Filter</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="row">
+  {% for t in travels %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">
+            {% if t.type == 'FLIGHT' %} <i class="fa-solid fa-plane-up"></i>
+            {% elif t.type == 'TRAIN' %} <i class="fa-solid fa-train"></i>
+            {% else %} <i class="fa-solid fa-bus"></i>
+            {% endif %}
+            {{ t.source }} → {{ t.destination }}
+          </h5>
+          <p class="card-text text-muted"><i class="far fa-calendar-alt"></i> {{ t.departure_datetime|date:"D, d M Y H:i" }}</p>
+          <div class="mt-auto">
+            <p class="mb-2"><strong>Seats:</strong> {{ t.available_seats }} | <strong>Price:</strong> ₹{{ t.price }}</p>
+            <a href="{% url 'travel:detail' t.pk %}" class="btn btn-sm btn-outline-primary stretched-link">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col">
+        <div class="alert alert-info">No travel options found matching your criteria.</div>
+    </div>
+  {% endfor %}
+</div>
+
+{% if travels.paginator.num_pages > 1 %}
+<nav class="mt-4 d-flex justify-content-center">
+  <ul class="pagination">
+    {% if travels.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ travels.previous_page_number }}{{ request.GET.urlencode }}">&laquo; Previous</a></li>
+    {% else %}
+       <li class="page-item disabled"><span class="page-link">&laquo; Previous</span></li>
+    {% endif %}
+
+    <li class="page-item active"><span class="page-link">Page {{ travels.number }} of {{ travels.paginator.num_pages }}</span></li>
+
+    {% if travels.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ travels.next_page_number }}{{ request.GET.urlencode }}">Next &raquo;</a></li>
+    {% else %}
+        <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'travel/base.html' %}
+{% block content %}
+
+  <div class="hero-section rounded">
+    <div class="container">
+      <h1 class="display-4">Find Your Next Adventure</h1>
+      <p class="lead">Book flights, trains, and buses with ease.</p>
+      <a href="{% url 'travel:list' %}" class="btn btn-primary btn-lg mt-3">
+        <i class="fas fa-search"></i> Browse All Options
+      </a>
+    </div>
+  </div>
+
+  <h2 class="mb-4">Recent Travel Options</h2>
+  <div class="row">
+    {% for t in recent %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">
+                {% if t.type == 'FLIGHT' %} <i class="fa-solid fa-plane-up"></i>
+                {% elif t.type == 'TRAIN' %} <i class="fa-solid fa-train"></i>
+                {% else %} <i class="fa-solid fa-bus"></i>
+                {% endif %}
+                {{ t.source }} → {{ t.destination }}
+            </h5>
+            <p class="card-text text-muted">
+                <i class="far fa-calendar-alt"></i> Depart: {{ t.departure_datetime|date:"D, d M Y H:i" }}
+            </p>
+            <h4 class="mt-auto">₹{{ t.price }}</h4>
+            <a href="{{ t.get_absolute_url }}" class="btn btn-outline-primary stretched-link">View Details</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+          <p>No recent travel options yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+{% endblock %}

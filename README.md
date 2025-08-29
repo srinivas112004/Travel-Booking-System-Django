@@ -1,0 +1,68 @@
+✈️ Travel Booking System (Django)
+
+A Django-based Travel Booking System with support for MySQL/SQLite. Users can search, book, and cancel travel options (Flights, Trains, Buses). Includes authentication, validations, and admin management.
+
+🚀 Live Demo:https://srinivas07.pythonanywhere.com
+
+🔑 Features:
+
+User Registration, Login, Logout
+
+Browse & search travel options with filters (type, source, destination, date)
+
+Booking with seat validation (prevents overbooking)
+
+Cancel bookings → seats auto-restored
+
+Admin panel to manage Travel Options & Bookings
+
+Unit tests for booking, cancellation, and filtering
+
+🛠️ Tech Stack:
+
+Backend: Django 4.x
+
+Database: MySQL 8 / SQLite3 (switchable)
+
+Frontend: Bootstrap 5 + Django Templates
+
+Deployment: PythonAnywhere
+
+⚙️ Setup (Local):
+git clone https://github.com/yourusername/travel_booking.git
+cd travel_booking_full
+python -m venv venv
+source venv/bin/activate   # (Windows: venv\Scripts\activate)
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+
+
+Visit: http://127.0.0.1:8000/
+
+🗄️ MySQL Setup (Optional)
+CREATE DATABASE travel_db;
+CREATE USER 'travel_user'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON travel_db.* TO 'travel_user'@'localhost';
+FLUSH PRIVILEGES;
+
+
+Then set in .env:
+
+USE_MYSQL=1
+MYSQL_DATABASE=travel_db
+MYSQL_USER=travel_user
+MYSQL_PASSWORD=password
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+
+ Unit Tests:
+python manage.py test
+
+(Add here: Login, Travel List, Booking, Cancel, Admin)
+
+👨Author:
+
+Developed by Srinivas Kandagatla
+Deployment:https://srinivas07.pythonanywhere.com
