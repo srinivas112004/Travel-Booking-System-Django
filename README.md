@@ -2,7 +2,7 @@
 
 A Django-based Travel Booking System with support for MySQL/SQLite. Users can search, book, and cancel travel options (Flights, Trains, Buses). Includes authentication, validations, and admin management.
 
-🚀 Live Demo: srinivas07.pythonanywhere.com
+🚀 Live Demo: https://srinivas07.pythonanywhere.com
 
 🔑 Features:
 
@@ -72,5 +72,5 @@ python manage.py test
 👨‍💻 Author:
 
 Developed by Srinivas Kandagatla
-Deployment: srinivas07.pythonanywhere.com
+Deployment:https://srinivas07.pythonanywhere.com
 
