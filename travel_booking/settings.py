@@ -11,6 +11,10 @@ DEBUG = os.environ.get("DEBUG", "1") == "1"
 # Allowed hosts
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
+# For production, also allow render domain
+if not DEBUG:
+    ALLOWED_HOSTS.append('.onrender.com')
+
 # Installed apps
 INSTALLED_APPS = [
     "django.contrib.admin",
