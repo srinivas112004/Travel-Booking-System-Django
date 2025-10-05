@@ -1,0 +1,113 @@
+{% extends 'travel/base.html' %}
+{% block title %}Edit Profile - TravelBooking{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Profile</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3"><i class="fas fa-user"></i> Personal Information</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email *</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone Number</label>
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gender</label>
+                            {{ form.gender }}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <h5 class="mb-3"><i class="fas fa-map-marker-alt"></i> Address</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 1</label>
+                        {{ form.address_line1 }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 2</label>
+                        {{ form.address_line2 }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">State</label>
+                            {{ form.state }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Postal Code</label>
+                            {{ form.postal_code }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Country</label>
+                        {{ form.country }}
+                    </div>
+                    
+                    <hr>
+                    <h5 class="mb-3"><i class="fas fa-plane"></i> Travel Preferences</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Preferred Travel Type</label>
+                        {{ form.preferred_travel_type }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        {{ form.bio }}
+                        <small class="form-text text-muted">Tell us a bit about yourself</small>
+                    </div>
+                    
+                    <hr>
+                    <h5 class="mb-3"><i class="fas fa-cog"></i> Preferences</h5>
+                    <div class="form-check mb-3">
+                        {{ form.newsletter_subscription }}
+                        <label class="form-check-label" for="id_newsletter_subscription">
+                            Subscribe to newsletter and travel updates
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% url 'travel:user_profile' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

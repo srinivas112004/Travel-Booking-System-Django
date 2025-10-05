@@ -1,0 +1,90 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/static
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+Thumbs.db
+.DS_Store
+*.bak
+
+# Secrets
+*.pem
+*.key
+secrets.json
+
+# Migration files (optional - uncomment if needed)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Collected static files
+staticfiles/
+static_root/
+
+# Media files (uploaded user content)
+media/
+
+# Database backups
+*.dump
+*.sql
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp

@@ -1,0 +1,248 @@
+{% extends 'travel/base.html' %}
+{% block title %}TravelBooking - Find Your Perfect Journey{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-paper-plane me-3"></i>
+            Find Your Perfect Journey
+        </h1>
+        <p class="lead mb-5">Book flights, trains, and buses with confidence. Compare prices, check availability, and travel with ease.</p>
+        
+        <!-- Quick Search -->
+        <div class="search-container mx-auto" style="max-width: 800px;">
+            <form method="get" action="{% url 'travel:list' %}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="typeSelect" class="form-label text-dark fw-semibold">Travel Type</label>
+                    <select class="form-select" id="typeSelect" name="type">
+                        <option value="">All Types</option>
+                        <option value="FLIGHT">✈️ Flights</option>
+                        <option value="TRAIN">🚂 Trains</option>
+                        <option value="BUS">🚌 Buses</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sourceInput" class="form-label text-dark fw-semibold">From</label>
+                    <input type="text" class="form-control" id="sourceInput" name="source" placeholder="Enter departure city">
+                </div>
+                <div class="col-md-3">
+                    <label for="destInput" class="form-label text-dark fw-semibold">To</label>
+                    <input type="text" class="form-control" id="destInput" name="destination" placeholder="Enter destination city">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-dark fw-semibold">&nbsp;</label>
+                    <button type="submit" class="btn btn-gradient w-100">
+                        <i class="fas fa-search me-2"></i>Search Trips
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="travel-type-icon flight-icon mx-auto">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <h3 class="card-title">Flights</h3>
+                    <p class="card-text text-muted">Quick and convenient air travel options</p>
+                    <div class="price-display">From $150</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="travel-type-icon train-icon mx-auto">
+                        <i class="fas fa-train"></i>
+                    </div>
+                    <h3 class="card-title">Trains</h3>
+                    <p class="card-text text-muted">Comfortable and scenic railway journeys</p>
+                    <div class="price-display">From $50</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="travel-type-icon bus-icon mx-auto">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <h3 class="card-title">Buses</h3>
+                    <p class="card-text text-muted">Affordable ground transportation</p>
+                    <div class="price-display">From $25</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Trips Section -->
+{% if recent %}
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">
+            <i class="fas fa-clock me-2"></i>
+            Upcoming Departures
+        </h2>
+        <a href="{% url 'travel:list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-right me-1"></i>View All
+        </a>
+    </div>
+    
+    <div class="row g-4">
+        {% for travel in recent %}
+        <div class="col-lg-6">
+            <div class="card travel-card {{ travel.type|lower }} h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            {% if travel.type == 'FLIGHT' %}
+                                <div class="travel-type-icon flight-icon me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                                    <i class="fas fa-plane"></i>
+                                </div>
+                            {% elif travel.type == 'TRAIN' %}
+                                <div class="travel-type-icon train-icon me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                                    <i class="fas fa-train"></i>
+                                </div>
+                            {% else %}
+                                <div class="travel-type-icon bus-icon me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="card-title mb-1">{{ travel.travel_id }}</h5>
+                                <p class="card-text text-muted small mb-0">{{ travel.type }}</p>
+                            </div>
+                        </div>
+                        <div class="availability">
+                            {% if travel.available_seats > 50 %}
+                                <span class="availability-dot high-availability"></span>
+                                <small class="text-success">{{ travel.available_seats }} seats</small>
+                            {% elif travel.available_seats > 20 %}
+                                <span class="availability-dot medium-availability"></span>
+                                <small class="text-warning">{{ travel.available_seats }} seats</small>
+                            {% else %}
+                                <span class="availability-dot low-availability"></span>
+                                <small class="text-danger">{{ travel.available_seats }} seats</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-5">
+                            <div class="text-center">
+                                <h6 class="mb-1">{{ travel.source }}</h6>
+                                <small class="text-muted">Departure</small>
+                            </div>
+                        </div>
+                        <div class="col-2 text-center">
+                            <i class="fas fa-arrow-right text-primary"></i>
+                        </div>
+                        <div class="col-5">
+                            <div class="text-center">
+                                <h6 class="mb-1">{{ travel.destination }}</h6>
+                                <small class="text-muted">Arrival</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ travel.departure_datetime|date:"M j, Y" }}
+                            </small>
+                            <br>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ travel.departure_datetime|date:"g:i A" }}
+                            </small>
+                        </div>
+                        <div class="text-end">
+                            <div class="price-display">${{ travel.price }}</div>
+                            <a href="{{ travel.get_absolute_url }}" class="btn btn-sm btn-outline-primary mt-2">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="container mb-5">
+    <div class="alert alert-info text-center">
+        <h4><i class="fas fa-info-circle me-2"></i>Welcome to TravelBooking!</h4>
+        <p class="mb-3">No upcoming trips available at the moment.</p>
+        <a href="{% url 'travel:list' %}" class="btn btn-primary">Browse All Options</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Features Section -->
+<div class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-4 text-center">
+            <div class="mb-3">
+                <i class="fas fa-shield-alt fa-3x text-primary"></i>
+            </div>
+            <h5>Secure Booking</h5>
+            <p class="text-muted">Your payments and personal information are protected with industry-standard security.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="mb-3">
+                <i class="fas fa-clock fa-3x text-success"></i>
+            </div>
+            <h5>24/7 Support</h5>
+            <p class="text-muted">Get help whenever you need it with our round-the-clock customer support.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="mb-3">
+                <i class="fas fa-mobile-alt fa-3x text-info"></i>
+            </div>
+            <h5>Mobile Friendly</h5>
+            <p class="text-muted">Book and manage your trips on any device, anywhere, anytime.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Button -->
+<a href="{% url 'travel:list' %}" class="fab" title="Browse All Trips">
+    <i class="fas fa-search"></i>
+</a>
+
+<script>
+// Add dynamic typing effect to hero title
+document.addEventListener('DOMContentLoaded', function() {
+    const destinations = ['Adventure', 'Journey', 'Experience', 'Trip'];
+    let currentIndex = 0;
+    
+    function updateDestination() {
+        // You can add more interactive features here
+    }
+    
+    // Auto-complete for city names
+    const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'];
+    
+    function setupAutocomplete(input) {
+        input.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            // Simple autocomplete logic can be added here
+        });
+    }
+    
+    setupAutocomplete(document.getElementById('sourceInput'));
+    setupAutocomplete(document.getElementById('destInput'));
+});
+</script>
+{% endblock %}

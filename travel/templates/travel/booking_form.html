@@ -1,0 +1,330 @@
+{% extends 'travel/base.html' %}
+{% block title %}Book {{ travel.travel_id }} - TravelBooking{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+            <!-- Booking Progress -->
+            <div class="booking-progress mb-4">
+                <div class="booking-progress-bar" style="width: 50%"></div>
+            </div>
+            
+            <!-- Booking Header -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            {% if travel.type == 'FLIGHT' %}
+                                <div class="travel-type-icon flight-icon me-3">
+                                    <i class="fas fa-plane"></i>
+                                </div>
+                            {% elif travel.type == 'TRAIN' %}
+                                <div class="travel-type-icon train-icon me-3">
+                                    <i class="fas fa-train"></i>
+                                </div>
+                            {% else %}
+                                <div class="travel-type-icon bus-icon me-3">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h4 class="mb-1">{{ travel.travel_id }}</h4>
+                                <p class="text-muted mb-0">{{ travel.type }} • {{ travel.source }} → {{ travel.destination }}</p>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="booking-timer">
+                                <i class="fas fa-clock"></i>
+                                <span id="bookingTimer">14:59</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if travel.available_seats <= 0 %}
+                <!-- Sold Out Card -->
+                <div class="card text-center">
+                    <div class="card-body py-5">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h4>This travel option is sold out</h4>
+                        <p class="text-muted mb-4">Unfortunately, all seats have been booked for this trip.</p>
+                        <a href="{% url 'travel:list' %}" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Find Alternative Options
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Booking Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>
+                            Complete Your Booking
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" id="bookingForm">
+                            {% csrf_token %}
+                            
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <!-- Trip Details Summary -->
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-route me-2"></i>Trip Details
+                                            </h6>
+                                            <div class="row text-center">
+                                                <div class="col-5">
+                                                    <strong>{{ travel.source }}</strong>
+                                                    <br><small class="text-muted">From</small>
+                                                </div>
+                                                <div class="col-2">
+                                                    <i class="fas fa-arrow-right text-primary"></i>
+                                                </div>
+                                                <div class="col-5">
+                                                    <strong>{{ travel.destination }}</strong>
+                                                    <br><small class="text-muted">To</small>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <p class="mb-1">
+                                                <i class="fas fa-calendar me-2"></i>
+                                                <strong>{{ travel.departure_datetime|date:"l, F j, Y" }}</strong>
+                                            </p>
+                                            <p class="mb-0">
+                                                <i class="fas fa-clock me-2"></i>
+                                                <strong>{{ travel.departure_datetime|date:"g:i A" }}</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-info-circle me-2"></i>Availability
+                                            </h6>
+                                            <div class="availability mb-3">
+                                                {% if travel.available_seats > 50 %}
+                                                    <span class="availability-dot high-availability"></span>
+                                                    <span class="text-success fw-bold">{{ travel.available_seats }} seats available</span>
+                                                {% elif travel.available_seats > 20 %}
+                                                    <span class="availability-dot medium-availability"></span>
+                                                    <span class="text-warning fw-bold">{{ travel.available_seats }} seats available</span>
+                                                {% else %}
+                                                    <span class="availability-dot low-availability"></span>
+                                                    <span class="text-danger fw-bold">Only {{ travel.available_seats }} seats left!</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="booking-progress">
+                                                {% if travel.available_seats > 100 %}
+                                                    <div class="booking-progress-bar" style="width: 90%"></div>
+                                                {% elif travel.available_seats > 50 %}
+                                                    <div class="booking-progress-bar" style="width: 60%"></div>
+                                                {% elif travel.available_seats > 20 %}
+                                                    <div class="booking-progress-bar" style="width: 30%"></div>
+                                                {% else %}
+                                                    <div class="booking-progress-bar" style="width: 10%"></div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Seat Selection -->
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-chair me-2"></i>Select Number of Seats
+                                    </h6>
+                                    
+                                    <div class="seat-counter">
+                                        <button type="button" class="seat-btn" id="decreaseSeats">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <div class="seat-count" id="seatCount">1</div>
+                                        <button type="button" class="seat-btn" id="increaseSeats">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <input type="hidden" name="{{ form.number_of_seats.name }}" id="seatInput" value="1" min="1" max="{{ travel.available_seats }}" required>
+                                    
+                                    {% if form.number_of_seats.errors %}
+                                        <div class="text-danger mt-2 text-center">
+                                            <small>{{ form.number_of_seats.errors.as_text }}</small>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <p class="text-center text-muted mt-2 mb-0">
+                                        <small>Maximum {{ travel.available_seats }} seats per booking</small>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Booking Summary -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-receipt me-2"></i>Booking Summary
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <p class="mb-1">Price per seat:</p>
+                                            <p class="mb-1">Number of seats:</p>
+                                            <p class="mb-1">Subtotal:</p>
+                                            <hr>
+                                            <p class="mb-0 fw-bold">Total Amount:</p>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <p class="mb-1">${{ travel.price }}</p>
+                                            <p class="mb-1" id="seatDisplay">1</p>
+                                            <p class="mb-1" id="subtotalDisplay">${{ travel.price }}</p>
+                                            <hr>
+                                            <p class="mb-0 fw-bold price-display" id="totalDisplay">${{ travel.price }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                <a href="{{ travel.get_absolute_url }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Details
+                                </a>
+                                <button type="submit" class="btn btn-success-gradient btn-lg" id="confirmBookingBtn">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Confirm Booking
+                                    <span id="loadingSpinner" class="loading ms-2 d-none"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pricePerSeat = parseFloat('{{ travel.price }}');
+    const maxSeats = parseInt('{{ travel.available_seats }}');
+    let currentSeats = 1;
+    
+    // Seat counter functionality
+    const decreaseBtn = document.getElementById('decreaseSeats');
+    const increaseBtn = document.getElementById('increaseSeats');
+    const seatCount = document.getElementById('seatCount');
+    const seatInput = document.getElementById('seatInput');
+    const seatDisplay = document.getElementById('seatDisplay');
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    const totalDisplay = document.getElementById('totalDisplay');
+    
+    function updateSeatCount(seats) {
+        currentSeats = Math.max(1, Math.min(maxSeats, seats));
+        seatCount.textContent = currentSeats;
+        seatInput.value = currentSeats;
+        seatDisplay.textContent = currentSeats;
+        
+        const subtotal = currentSeats * pricePerSeat;
+        subtotalDisplay.textContent = '$' + subtotal.toFixed(2);
+        totalDisplay.textContent = '$' + subtotal.toFixed(2);
+        
+        // Update button states
+        decreaseBtn.disabled = currentSeats <= 1;
+        increaseBtn.disabled = currentSeats >= maxSeats;
+        
+        // Add visual feedback
+        seatCount.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            seatCount.style.transform = 'scale(1)';
+        }, 150);
+    }
+    
+    decreaseBtn.addEventListener('click', () => updateSeatCount(currentSeats - 1));
+    increaseBtn.addEventListener('click', () => updateSeatCount(currentSeats + 1));
+    
+    // Form submission with loading state
+    const form = document.getElementById('bookingForm');
+    const submitBtn = document.getElementById('confirmBookingBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        loadingSpinner.classList.remove('d-none');
+        submitBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Processing... <span class="loading ms-2"></span>';
+    });
+    
+    // Booking timer countdown
+    let timeLeft = 15 * 60; // 15 minutes
+    const timerElement = document.getElementById('bookingTimer');
+    
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 5 * 60) { // Last 5 minutes
+            timerElement.parentElement.style.background = 'linear-gradient(135deg, #ff6b6b, #ff5722)';
+        }
+        
+        if (timeLeft <= 0) {
+            timerElement.textContent = '0:00';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Booking Expired';
+            return;
+        }
+        
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+    }
+    
+    updateTimer();
+    
+    // Initial state
+    updateSeatCount(1);
+});
+</script>
+
+<style>
+.seat-counter {
+    transition: all 0.3s ease;
+}
+
+.seat-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.seat-count {
+    transition: transform 0.15s ease;
+}
+
+#bookingForm {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}

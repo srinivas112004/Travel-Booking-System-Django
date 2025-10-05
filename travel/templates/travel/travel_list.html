@@ -1,0 +1,377 @@
+{% extends 'travel/base.html' %}
+{% block title %}Browse Travel Options - TravelBooking{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">
+                <i class="fas fa-compass me-2"></i>
+                Explore Travel Options
+            </h1>
+            <p class="text-muted">Find the perfect trip for your journey</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="gridView" title="Grid View">
+                <i class="fas fa-th"></i>
+            </button>
+            <button class="btn btn-outline-secondary" id="listView" title="List View">
+                <i class="fas fa-list"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Enhanced Search/Filter Section -->
+    <div class="card search-container mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3" id="filterForm">
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <select name="type" id="type" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="FLIGHT" {% if request.GET.type == "FLIGHT" %}selected{% endif %}>✈️ Flight</option>
+                            <option value="TRAIN" {% if request.GET.type == "TRAIN" %}selected{% endif %}>🚂 Train</option>
+                            <option value="BUS" {% if request.GET.type == "BUS" %}selected{% endif %}>🚌 Bus</option>
+                        </select>
+                        <label for="type">Travel Type</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input name="source" id="source" class="form-control" placeholder="Source" value="{{ request.GET.source }}">
+                        <label for="source">From</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input name="destination" id="destination" class="form-control" placeholder="Destination" value="{{ request.GET.destination }}">
+                        <label for="destination">To</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input name="date" type="date" id="date" class="form-control" value="{{ request.GET.date }}">
+                        <label for="date">Date</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input name="q" id="q" class="form-control" placeholder="Search..." value="{{ request.GET.q }}">
+                        <label for="q">Search</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-gradient w-100 h-100">
+                        <i class="fas fa-search me-1"></i>Search
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Active Filters Display -->
+            {% if request.GET.type or request.GET.source or request.GET.destination or request.GET.date or request.GET.q %}
+            <div class="mt-3">
+                <small class="text-muted">Active filters:</small>
+                <div class="d-flex flex-wrap gap-2 mt-1">
+                    {% if request.GET.type %}
+                        <span class="badge bg-primary">Type: {{ request.GET.type }}</span>
+                    {% endif %}
+                    {% if request.GET.source %}
+                        <span class="badge bg-primary">From: {{ request.GET.source }}</span>
+                    {% endif %}
+                    {% if request.GET.destination %}
+                        <span class="badge bg-primary">To: {{ request.GET.destination }}</span>
+                    {% endif %}
+                    {% if request.GET.date %}
+                        <span class="badge bg-primary">Date: {{ request.GET.date }}</span>
+                    {% endif %}
+                    {% if request.GET.q %}
+                        <span class="badge bg-primary">Search: {{ request.GET.q }}</span>
+                    {% endif %}
+                    <a href="{% url 'travel:list' %}" class="badge bg-secondary text-decoration-none">
+                        <i class="fas fa-times me-1"></i>Clear All
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    {% if travels %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h6 class="mb-0">
+                <span class="badge bg-success">{{ travels.paginator.count }}</span>
+                travel options found
+            </h6>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-sort me-1"></i>Sort by
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" data-sort="price">Price (Low to High)</a></li>
+                <li><a class="dropdown-item" href="#" data-sort="departure">Departure Time</a></li>
+                <li><a class="dropdown-item" href="#" data-sort="seats">Available Seats</a></li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Travel Options Grid -->
+    <div class="row g-4" id="travelGrid">
+        {% for t in travels %}
+        <div class="col-lg-4 col-md-6 travel-item" data-price="{{ t.price }}" data-departure="{{ t.departure_datetime|date:'U' }}" data-seats="{{ t.available_seats }}">
+            <div class="card travel-card {{ t.type|lower }} h-100">
+                <div class="card-body">
+                    <!-- Travel Type Header -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            {% if t.type == 'FLIGHT' %}
+                                <div class="travel-type-icon flight-icon me-3" style="width: 45px; height: 45px; font-size: 18px;">
+                                    <i class="fas fa-plane"></i>
+                                </div>
+                            {% elif t.type == 'TRAIN' %}
+                                <div class="travel-type-icon train-icon me-3" style="width: 45px; height: 45px; font-size: 18px;">
+                                    <i class="fas fa-train"></i>
+                                </div>
+                            {% else %}
+                                <div class="travel-type-icon bus-icon me-3" style="width: 45px; height: 45px; font-size: 18px;">
+                                    <i class="fas fa-bus"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="card-title mb-1">{{ t.travel_id }}</h6>
+                                <small class="text-muted">{{ t.type }}</small>
+                            </div>
+                        </div>
+                        <div class="availability">
+                            {% if t.available_seats > 50 %}
+                                <span class="availability-dot high-availability"></span>
+                                <small class="text-success fw-bold">{{ t.available_seats }}</small>
+                            {% elif t.available_seats > 20 %}
+                                <span class="availability-dot medium-availability"></span>
+                                <small class="text-warning fw-bold">{{ t.available_seats }}</small>
+                            {% else %}
+                                <span class="availability-dot low-availability"></span>
+                                <small class="text-danger fw-bold">{{ t.available_seats }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Route Information -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-5">
+                            <div class="text-center">
+                                <h6 class="mb-1 fw-bold">{{ t.source }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ t.departure_datetime|date:"M j" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-2 text-center">
+                            <div class="d-flex flex-column align-items-center">
+                                <i class="fas fa-arrow-right text-primary mb-1"></i>
+                                <small class="text-muted">{{ t.departure_datetime|date:"g:i A" }}</small>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="text-center">
+                                <h6 class="mb-1 fw-bold">{{ t.destination }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Est. Arrival
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Progress Bar -->
+                    <div class="booking-progress mb-3">
+                        {% if t.available_seats > 100 %}
+                            <div class="booking-progress-bar" style="width: 90%"></div>
+                        {% elif t.available_seats > 50 %}
+                            <div class="booking-progress-bar" style="width: 60%"></div>
+                        {% elif t.available_seats > 20 %}
+                            <div class="booking-progress-bar" style="width: 30%"></div>
+                        {% else %}
+                            <div class="booking-progress-bar" style="width: 10%"></div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price and Action -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="price-display">${{ t.price }}</div>
+                        <a href="{% url 'travel:detail' t.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                    </div>
+
+                    <!-- Quick Book (for authenticated users) -->
+                    {% if user.is_authenticated and t.available_seats > 0 %}
+                    <div class="mt-3">
+                        <a href="{% url 'travel:book' t.pk %}" class="btn btn-success-gradient btn-sm w-100">
+                            <i class="fas fa-bolt me-1"></i>Quick Book
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card text-center">
+                <div class="card-body py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5>No travel options found</h5>
+                    <p class="text-muted">Try adjusting your search criteria or browse all available options.</p>
+                    <a href="{% url 'travel:list' %}" class="btn btn-primary">
+                        <i class="fas fa-refresh me-1"></i>View All Options
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Enhanced Pagination -->
+    {% if travels.paginator.num_pages > 1 %}
+    <nav class="mt-5 d-flex justify-content-center">
+        <ul class="pagination pagination-lg">
+            {% if travels.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ travels.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in travels.paginator.page_range %}
+                {% if num == travels.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > travels.number|add:'-3' and num < travels.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if travels.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ travels.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ travels.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center" style="z-index: 9999;">
+    <div class="text-center text-white">
+        <div class="loading mb-3"></div>
+        <p>Searching travel options...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Live search functionality
+    const form = document.getElementById('filterForm');
+    const inputs = form.querySelectorAll('input, select');
+    
+    // Auto-submit form on input change with debounce
+    let timeout;
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (this.value.length >= 2 || this.value === '') {
+                    showLoading();
+                    form.submit();
+                }
+            }, 500);
+        });
+    });
+    
+    // Sort functionality
+    document.querySelectorAll('[data-sort]').forEach(sortBtn => {
+        sortBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortBy = this.dataset.sort;
+            sortTravelItems(sortBy);
+        });
+    });
+    
+    // View toggle functionality
+    document.getElementById('gridView').addEventListener('click', function() {
+        document.getElementById('travelGrid').className = 'row g-4';
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-outline-secondary');
+        document.getElementById('listView').classList.add('btn-outline-secondary');
+        document.getElementById('listView').classList.remove('btn-primary');
+    });
+    
+    document.getElementById('listView').addEventListener('click', function() {
+        document.getElementById('travelGrid').className = 'row g-2';
+        this.classList.add('btn-primary');
+        this.classList.remove('btn-outline-secondary');
+        document.getElementById('gridView').classList.add('btn-outline-secondary');
+        document.getElementById('gridView').classList.remove('btn-primary');
+    });
+    
+    function showLoading() {
+        document.getElementById('loadingOverlay').classList.remove('d-none');
+    }
+    
+    function sortTravelItems(sortBy) {
+        const grid = document.getElementById('travelGrid');
+        const items = Array.from(grid.querySelectorAll('.travel-item'));
+        
+        items.sort((a, b) => {
+            const aValue = parseFloat(a.dataset[sortBy]);
+            const bValue = parseFloat(b.dataset[sortBy]);
+            return aValue - bValue;
+        });
+        
+        items.forEach(item => grid.appendChild(item));
+        
+        // Add animation
+        items.forEach((item, index) => {
+            setTimeout(() => {
+                item.style.animation = 'fadeInUp 0.3s ease forwards';
+            }, index * 50);
+        });
+    }
+});
+</script>
+
+<style>
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}

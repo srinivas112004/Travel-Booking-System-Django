@@ -1,0 +1,192 @@
+{% extends 'travel/base.html' %}
+{% block title %}Admin Dashboard - TravelBooking{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-chart-line"></i> Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-ticket-alt"></i> Total Bookings</h5>
+                <h2 class="mb-0">{{ total_bookings }}</h2>
+                <small>Today: {{ todays_bookings }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-dollar-sign"></i> Total Revenue</h5>
+                <h2 class="mb-0">${{ total_revenue }}</h2>
+                <small>Week: ${{ week_revenue }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-users"></i> Total Users</h5>
+                <h2 class="mb-0">{{ total_users }}</h2>
+                <small>Active: {{ active_users }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-times-circle"></i> Cancelled</h5>
+                <h2 class="mb-0">{{ cancelled_bookings }}</h2>
+                <small>Refunds: ${{ total_refunds }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Bookings Trend (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Bookings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in bookings_trend %}
+                        <tr>
+                            <td>{{ item.date }}</td>
+                            <td><span class="badge bg-primary">{{ item.count }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Revenue Trend (Last 7 Days)</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in revenue_trend %}
+                        <tr>
+                            <td>{{ item.date }}</td>
+                            <td><span class="badge bg-success">${{ item.revenue }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-fire"></i> Popular Routes</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Bookings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for route in popular_routes %}
+                        <tr>
+                            <td>{{ route.travel_option__source }}</td>
+                            <td>{{ route.travel_option__destination }}</td>
+                            <td><span class="badge bg-primary">{{ route.count }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Bookings</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>User</th>
+                            <th>Route</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in recent_bookings %}
+                        <tr>
+                            <td><small>{{ booking.booking_id|slice:":8" }}...</small></td>
+                            <td>{{ booking.user.username }}</td>
+                            <td>{{ booking.travel_option.source }} → {{ booking.travel_option.destination }}</td>
+                            <td>{{ booking.booking_date|date:"M d, H:i" }}</td>
+                            <td>${{ booking.total_price }}</td>
+                            <td>
+                                {% if booking.status == 'CONFIRMED' %}
+                                <span class="badge bg-success">{{ booking.status }}</span>
+                                {% else %}
+                                <span class="badge bg-danger">{{ booking.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">No bookings yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <a href="{% url 'travel:admin_bookings' %}" class="btn btn-primary me-2">
+            <i class="fas fa-list"></i> View All Bookings
+        </a>
+        <a href="{% url 'travel:admin_users' %}" class="btn btn-info me-2">
+            <i class="fas fa-users"></i> Manage Users
+        </a>
+        <a href="{% url 'travel:admin_travel_options' %}" class="btn btn-success">
+            <i class="fas fa-plane"></i> Manage Travel Options
+        </a>
+    </div>
+</div>
+{% endblock %}

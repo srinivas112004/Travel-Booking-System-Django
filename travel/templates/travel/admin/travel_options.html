@@ -1,0 +1,71 @@
+{% extends 'travel/base.html' %}
+{% block title %}Admin - Travel Options{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-plane"></i> Travel Options</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="GET" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <select name="type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="FLIGHT" {% if travel_type == 'FLIGHT' %}selected{% endif %}>Flight</option>
+                    <option value="TRAIN" {% if travel_type == 'TRAIN' %}selected{% endif %}>Train</option>
+                    <option value="BUS" {% if travel_type == 'BUS' %}selected{% endif %}>Bus</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="source" class="form-control" placeholder="Source..." value="{{ source }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="destination" class="form-control" placeholder="Destination..." value="{{ destination }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Route</th>
+                        <th>Departure</th>
+                        <th>Price</th>
+                        <th>Available</th>
+                        <th>Bookings</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for travel in travel_options %}
+                    <tr>
+                        <td>{{ travel.travel_id }}</td>
+                        <td>{{ travel.type }}</td>
+                        <td>{{ travel.source }} → {{ travel.destination }}</td>
+                        <td>{{ travel.departure_datetime|date:"M d, Y H:i" }}</td>
+                        <td>${{ travel.price }}</td>
+                        <td>
+                            {% if travel.available_seats <= 5 %}
+                            <span class="badge bg-warning">{{ travel.available_seats }}</span>
+                            {% else %}
+                            <span class="badge bg-success">{{ travel.available_seats }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ travel.booking_count }}</td>
+                        <td>${{ travel.revenue|default:"0" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">No travel options found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

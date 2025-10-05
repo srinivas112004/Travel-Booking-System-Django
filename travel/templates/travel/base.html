@@ -1,0 +1,211 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}TravelBooking - Your Journey Begins Here{% endblock %}</title>
+    <meta name="description" content="Book flights, trains, and buses with ease. Compare prices and find the best travel options.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{% static 'travel/css/styles.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'travel:index' %}" style="font-weight: 700; font-size: 1.5rem;">
+                <div class="travel-type-icon flight-icon me-2" style="width: 40px; height: 40px; font-size: 16px;">
+                    <i class="fas fa-plane-departure"></i>
+                </div>
+                TravelBooking
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'travel:list' %}">
+                            <i class="fas fa-search me-1"></i> Browse Trips
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'travel:admin_dashboard' %}">
+                                <i class="fas fa-chart-line me-1"></i> Admin Dashboard
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                {{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'travel:user_profile' %}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'travel:my_bookings' %}"><i class="fas fa-briefcase me-2"></i>My Bookings</a></li>
+                                <li><a class="dropdown-item" href="{% url 'travel:booking_history' %}"><i class="fas fa-history me-2"></i>Booking History</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'travel:edit_profile' %}"><i class="fas fa-edit me-2"></i>Edit Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'travel:change_password' %}"><i class="fas fa-key me-2"></i>Change Password</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'travel:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item me-2">
+                            <a class="nav-link" href="{% url 'travel:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-success-gradient btn-sm text-white px-3" href="{% url 'travel:register' %}">
+                                <i class="fas fa-user-plus me-1"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if msg.tags == 'success' %}check-circle{% elif msg.tags == 'error' %}exclamation-circle{% elif msg.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ msg }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="mt-auto py-4" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="fw-bold">TravelBooking</h6>
+                    <p class="text-muted small mb-0">Your trusted travel companion</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end gap-3">
+                        <a href="#" class="text-muted text-decoration-none">
+                            <i class="fab fa-facebook fa-lg"></i>
+                        </a>
+                        <a href="#" class="text-muted text-decoration-none">
+                            <i class="fab fa-twitter fa-lg"></i>
+                        </a>
+                        <a href="#" class="text-muted text-decoration-none">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                    </div>
+                    <p class="text-muted small mt-2 mb-0">© 2025 TravelBooking. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Toast Notifications Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer"></div>
+    
+    <!-- Global JavaScript -->
+    <script>
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const toastHtml = `
+                <div class="toast" id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="fas fa-${type === 'success' ? 'check-circle text-success' : 'exclamation-circle text-danger'} me-2"></i>
+                        <strong class="me-auto">TravelBooking</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toast = new bootstrap.Toast(document.getElementById(toastId));
+            toast.show();
+            
+            setTimeout(() => {
+                document.getElementById(toastId)?.remove();
+            }, 5000);
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Add loading states to buttons
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.disabled) {
+                    submitBtn.disabled = true;
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<span class="loading me-2"></span>Processing...';
+                    
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }, 3000);
+                }
+            });
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        document.querySelectorAll('.alert:not(.alert-permanent)').forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+        
+        // Add smooth animations to cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

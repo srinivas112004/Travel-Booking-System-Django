@@ -1,0 +1,195 @@
+{% extends 'travel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Cancel Booking</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> <strong>Important:</strong> Once cancelled, this action cannot be undone.
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="card mb-4 border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Booking Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Booking ID:</div>
+                                <div class="col-md-8">{{ booking.booking_id }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Travel Route:</div>
+                                <div class="col-md-8">
+                                    {{ booking.travel_option.source }} → {{ booking.travel_option.destination }}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Travel Type:</div>
+                                <div class="col-md-8">
+                                    {{ booking.travel_option.type }}
+                                    {% if booking.travel_option.type == 'FLIGHT' %}✈️
+                                    {% elif booking.travel_option.type == 'TRAIN' %}🚂
+                                    {% else %}🚌{% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Departure Date:</div>
+                                <div class="col-md-8">{{ booking.travel_option.departure_datetime|date:"F d, Y g:i A" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-4 fw-bold">Number of Seats:</div>
+                                <div class="col-md-8">{{ booking.number_of_seats }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 fw-bold">Total Amount Paid:</div>
+                                <div class="col-md-8 text-primary fs-5">${{ booking.total_price }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Refund Information -->
+                    <div class="card mb-4 {% if refund_amount > 0 %}border-success{% else %}border-danger{% endif %}">
+                        <div class="card-header {% if refund_amount > 0 %}bg-success{% else %}bg-danger{% endif %} text-white">
+                            <h5 class="mb-0">Refund Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="refund-breakdown">
+                                <div class="row mb-3">
+                                    <div class="col-md-6 fw-bold">Original Amount:</div>
+                                    <div class="col-md-6 text-end">${{ booking.total_price }}</div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6 fw-bold">Cancellation Fee ({{ cancellation_percentage }}%):</div>
+                                    <div class="col-md-6 text-end text-danger">-${{ cancellation_fee }}</div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6 fw-bold fs-5">Refund Amount:</div>
+                                    <div class="col-md-6 text-end fs-4 fw-bold {% if refund_amount > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        ${{ refund_amount }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if refund_amount > 0 %}
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="fas fa-clock"></i> <strong>Refund Processing:</strong> Your refund will be processed within 5-7 business days and credited to your original payment method.
+                            </div>
+                            {% else %}
+                            <div class="alert alert-danger mt-3 mb-0">
+                                <i class="fas fa-times-circle"></i> <strong>No Refund:</strong> Unfortunately, cancellations made less than 2 hours before departure are not eligible for a refund as per our cancellation policy.
+                            </div>
+                            {% endif %}
+
+                            <!-- Cancellation Policy -->
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <h6 class="fw-bold mb-2"><i class="fas fa-info-circle"></i> Cancellation Policy:</h6>
+                                <ul class="mb-0 small">
+                                    <li>≥ 48 hours before departure: <strong>90% refund</strong> (10% fee)</li>
+                                    <li>≥ 24 hours before departure: <strong>70% refund</strong> (30% fee)</li>
+                                    <li>≥ 2 hours before departure: <strong>50% refund</strong> (50% fee)</li>
+                                    <li>< 2 hours before departure: <strong>No refund</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancellation Form -->
+                    <form method="POST" id="cancellationForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="cancellation_reason" class="form-label fw-bold">
+                                <i class="fas fa-comment"></i> Reason for Cancellation (Optional)
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="cancellation_reason" 
+                                name="reason" 
+                                rows="3" 
+                                placeholder="Please let us know why you're cancelling (optional)..."
+                            ></textarea>
+                            <small class="text-muted">This helps us improve our service.</small>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="confirmCancel" required>
+                            <label class="form-check-label fw-bold" for="confirmCancel">
+                                I understand that this cancellation is final and cannot be undone.
+                                {% if refund_amount > 0 %}
+                                I will receive a refund of <span class="text-success">${{ refund_amount }}</span>.
+                                {% else %}
+                                I will <span class="text-danger">NOT receive any refund</span>.
+                                {% endif %}
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'travel:my_bookings' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Keep Booking
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg" id="cancelBtn" disabled>
+                                <i class="fas fa-times-circle"></i> Confirm Cancellation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Enable cancel button only when checkbox is checked
+    document.getElementById('confirmCancel').addEventListener('change', function() {
+        document.getElementById('cancelBtn').disabled = !this.checked;
+    });
+
+    // Final confirmation before submitting
+    document.getElementById('cancellationForm').addEventListener('submit', function(e) {
+        const refundAmount = {{ refund_amount }};
+        let confirmMessage = 'Are you absolutely sure you want to cancel this booking?\n\n';
+        
+        if (refundAmount > 0) {
+            confirmMessage += 'You will receive a refund of $' + refundAmount.toFixed(2) + ' within 5-7 business days.';
+        } else {
+            confirmMessage += 'You will NOT receive any refund for this cancellation.';
+        }
+        
+        if (!confirm(confirmMessage)) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+<style>
+    .refund-breakdown {
+        font-size: 1.1rem;
+    }
+    
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .form-check-input:checked {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    
+    #cancelBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,479 @@
+{% extends 'travel/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  .auth-page {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  .auth-container {
+    max-width: 520px;
+    width: 100%;
+    position: relative;
+    animation: slideInUp 0.6s ease-out;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .auth-card {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 30px;
+    padding: 50px 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(17, 153, 142, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+  }
+
+  @keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .auth-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .auth-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    box-shadow: 0 15px 35px rgba(17, 153, 142, 0.4);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .auth-icon i {
+    font-size: 40px;
+    color: white;
+  }
+
+  .auth-title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .auth-subtitle {
+    color: #6c757d;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .auth-form .form-group {
+    margin-bottom: 22px;
+  }
+
+  .auth-form label {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .auth-form input,
+  .auth-form select,
+  .auth-form textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    font-size: 0.95rem;
+    transition: all 0.4s ease;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .auth-form input:focus,
+  .auth-form select:focus,
+  .auth-form textarea:focus {
+    outline: none;
+    border-color: #11998e;
+    box-shadow: 0 0 0 0.3rem rgba(17, 153, 142, 0.25), 0 0 30px rgba(17, 153, 142, 0.3);
+    transform: translateY(-2px);
+    background: white;
+  }
+
+  .auth-form .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+  }
+
+  .auth-form .errorlist li {
+    color: #dc3545;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: rgba(220, 53, 69, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border-left: 3px solid #dc3545;
+    margin-top: 5px;
+  }
+
+  .auth-form .helptext {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 5px;
+    display: block;
+    line-height: 1.4;
+  }
+
+  .auth-form ul.helptext {
+    list-style: none;
+    padding: 0;
+  }
+
+  .auth-submit {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 15px;
+    border: none;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    box-shadow: 0 10px 30px rgba(17, 153, 142, 0.4);
+    transition: all 0.4s ease;
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-submit::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .auth-submit:hover::before {
+    width: 400px;
+    height: 400px;
+  }
+
+  .auth-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(17, 153, 142, 0.5);
+  }
+
+  .auth-submit:active {
+    transform: translateY(-1px);
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid #f0f0f0;
+  }
+
+  .auth-footer p {
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+
+  .auth-footer a {
+    color: #11998e;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .auth-footer a:hover {
+    color: #38ef7d;
+    text-decoration: underline;
+  }
+
+  .input-with-icon {
+    position: relative;
+  }
+
+  .input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .input-with-icon input {
+    padding-left: 45px;
+  }
+
+  .input-with-icon input:focus ~ i {
+    color: #11998e;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+
+  .password-toggle:hover {
+    color: #11998e;
+  }
+
+  .strength-meter {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .strength-meter-bar {
+    height: 100%;
+    width: 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+  }
+
+  .strength-weak { 
+    width: 33%; 
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  }
+
+  .strength-medium { 
+    width: 66%; 
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  }
+
+  .strength-strong { 
+    width: 100%; 
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+
+  @media (max-width: 576px) {
+    .auth-card {
+      padding: 40px 25px;
+      border-radius: 20px;
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+    }
+
+    .auth-icon {
+      width: 65px;
+      height: 65px;
+    }
+
+    .auth-icon i {
+      font-size: 32px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-icon">
+          <i class="fas fa-user-plus"></i>
+        </div>
+        <h2 class="auth-title">Join Us Today!</h2>
+        <p class="auth-subtitle">Create your account and start booking</p>
+      </div>
+
+      <form method="post" class="auth-form">
+        {% csrf_token %}
+        
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="input-with-icon">
+              {% if field.name == 'username' %}
+                <i class="fas fa-user"></i>
+              {% elif field.name == 'email' %}
+                <i class="fas fa-envelope"></i>
+              {% elif field.name == 'first_name' %}
+                <i class="fas fa-id-card"></i>
+              {% elif field.name == 'last_name' %}
+                <i class="fas fa-id-card"></i>
+              {% elif 'password' in field.name %}
+                <i class="fas fa-lock"></i>
+              {% endif %}
+              
+              {% if 'password' in field.name %}
+                <input type="password" 
+                       name="{{ field.name }}" 
+                       id="{{ field.id_for_label }}"
+                       {% if field.field.required %}required{% endif %}
+                       placeholder="Enter a strong password"
+                       {% if field.name == 'password1' %}onkeyup="checkPasswordStrength(this)"{% endif %}>
+                <i class="fas fa-eye password-toggle" onclick="togglePassword('{{ field.id_for_label }}', this)"></i>
+                {% if field.name == 'password1' %}
+                  <div class="strength-meter">
+                    <div class="strength-meter-bar" id="strengthBar"></div>
+                  </div>
+                  <small id="strengthText" class="helptext"></small>
+                {% endif %}
+              {% else %}
+                {{ field }}
+              {% endif %}
+              
+              {% if field.errors %}
+                <ul class="errorlist">
+                  {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              
+              {% if field.help_text and field.name != 'password1' %}
+                <small class="helptext">{{ field.help_text|safe }}</small>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <button type="submit" class="auth-submit">
+          <i class="fas fa-user-plus me-2"></i> Create Account
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Already have an account? <a href="{% url 'travel:login' %}">Sign in here</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePassword(fieldId, icon) {
+    const field = document.getElementById(fieldId);
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      field.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
+
+  function checkPasswordStrength(input) {
+    const password = input.value;
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    // Remove all strength classes
+    strengthBar.className = 'strength-meter-bar';
+    
+    if (password.length === 0) {
+      strengthText.textContent = '';
+      return;
+    }
+    
+    let strength = 0;
+    
+    // Length check
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    
+    // Character variety checks
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+    
+    // Apply strength class and text
+    if (strength <= 2) {
+      strengthBar.classList.add('strength-weak');
+      strengthText.textContent = '⚠️ Weak password - Add more characters and variety';
+      strengthText.style.color = '#dc3545';
+    } else if (strength <= 4) {
+      strengthBar.classList.add('strength-medium');
+      strengthText.textContent = '👍 Medium strength - Consider adding special characters';
+      strengthText.style.color = '#ffc107';
+    } else {
+      strengthBar.classList.add('strength-strong');
+      strengthText.textContent = '✓ Strong password!';
+      strengthText.style.color = '#11998e';
+    }
+  }
+
+  // Add smooth focus animation to inputs
+  document.querySelectorAll('.auth-form input').forEach(input => {
+    input.addEventListener('focus', function() {
+      this.parentElement.style.transform = 'scale(1.02)';
+    });
+    input.addEventListener('blur', function() {
+      this.parentElement.style.transform = 'scale(1)';
+    });
+  });
+</script>
+{% endblock %}

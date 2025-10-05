@@ -1,0 +1,49 @@
+{% extends 'travel/base.html' %}
+{% block content %}
+
+<div class="card shadow-lg">
+  <div class="card-header bg-dark text-white">
+    <h3 class="mb-0">
+        {% if travel.type == 'FLIGHT' %} <i class="fa-solid fa-plane-up"></i>
+        {% elif travel.type == 'TRAIN' %} <i class="fa-solid fa-train"></i>
+        {% else %} <i class="fa-solid fa-bus"></i>
+        {% endif %}
+        Trip Summary: {{ travel.travel_id }}
+    </h3>
+  </div>
+  <div class="card-body">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h4 class="card-title">{{ travel.source }} <i class="fas fa-long-arrow-alt-right"></i> {{ travel.destination }}</h4>
+            <p class="text-muted mb-4"><strong>Departure:</strong> {{ travel.departure_datetime|date:"l, F j, Y, P" }}</p>
+
+            <div class="d-flex justify-content-around text-center">
+                <div>
+                    <p class="mb-0 text-muted">Price</p>
+                    <h5 class="mb-0">₹{{ travel.price }}</h5>
+                </div>
+                <div>
+                    <p class="mb-0 text-muted">Seats Available</p>
+                    <h5 class="mb-0">{{ travel.available_seats }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mt-3 mt-md-0">
+            {% if travel.available_seats > 0 %}
+                {% if user.is_authenticated %}
+                    <a href="{% url 'travel:book' travel.pk %}" class="btn btn-success btn-lg">Book Now</a>
+                {% else %}
+                    <p class="text-muted mb-2">Please log in to book</p>
+                    <a href="{% url 'travel:login' %}?next={% url 'travel:book' travel.pk %}" class="btn btn-primary btn-lg">Login to Book</a>
+                    <br><br>
+                    <small>Don't have an account? <a href="{% url 'travel:register' %}">Register here</a></small>
+                {% endif %}
+            {% else %}
+                <button class="btn btn-secondary btn-lg" disabled>Sold Out</button>
+            {% endif %}
+        </div>
+    </div>
+  </div>
+</div>
+<a href="{% url 'travel:list' %}" class="btn btn-outline-secondary mt-3"><i class="fas fa-arrow-left"></i> Back to List</a>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'travel/base.html' %}
+{% block title %}Booking History - TravelBooking{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="fas fa-history"></i> Booking History</h4>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="CONFIRMED" {% if status_filter == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+                    <option value="CANCELLED" {% if status_filter == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="travel_type" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="FLIGHT" {% if travel_type == 'FLIGHT' %}selected{% endif %}>Flight</option>
+                    <option value="TRAIN" {% if travel_type == 'TRAIN' %}selected{% endif %}>Train</option>
+                    <option value="BUS" {% if travel_type == 'BUS' %}selected{% endif %}>Bus</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+        </form>
+        
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Route</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Seats</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td><small>{{ booking.booking_id }}</small></td>
+                        <td>{{ booking.travel_option.source }} → {{ booking.travel_option.destination }}</td>
+                        <td>{{ booking.travel_option.type }}</td>
+                        <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                        <td>{{ booking.number_of_seats }}</td>
+                        <td>${{ booking.total_price }}</td>
+                        <td>
+                            {% if booking.status == 'CONFIRMED' %}
+                            <span class="badge bg-success">Confirmed</span>
+                            {% else %}
+                            <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No bookings found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
